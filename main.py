@@ -102,3 +102,8 @@ for epoch in range(num_epochs):
     if epochs_no_improve == early_stop:
         print(f"No improvement in {early_stop} epochs, stopping training.")
         break
+
+# Save the trained model in ONNX format
+dummy_input1 = torch.randn(1, 3, 52, 52).to(device)
+dummy_input2 = torch.randn(1, 3, 52, 52).to(device)
+torch.onnx.export(model, (dummy_input1, dummy_input2), "trained_model.onnx", verbose=True)
