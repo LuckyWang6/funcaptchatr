@@ -5,12 +5,13 @@ from torch.optim import SGD
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
+# 确保你已经有 models.siamese 和 custom_dataset 的相应代码
 from models.siamese import Siamese
 from custom_dataset import CustomSiameseDataset
 
 # 配置参数
-batch_size = 16
-image_folder = './data'
+batch_size = 32
+image_folder = './jpg'
 validation_split = 0.2  # 验证集比例
 num_epochs = 300
 learning_rate = 1e-3
@@ -18,12 +19,12 @@ momentum = 0.9
 early_stop = 30
 
 # 加载数据集
-dataset = CustomSiameseDataset(image_folder = image_folder)
+dataset = CustomSiameseDataset(image_folder=image_folder)
 train_size = int((1 - validation_split) * len(dataset))
 val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-train_loader = DataLoader(train_dataset, batch_size = batch_size, shuffle = True)
-val_loader = DataLoader(val_dataset, batch_size = batch_size, shuffle = False)
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # 配置设备
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -34,7 +35,7 @@ model = model.to(device)
 
 # 损失函数和优化器
 criterion = nn.BCELoss()
-optimizer = SGD(model.parameters(), lr = learning_rate, momentum = momentum)
+optimizer = SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 
 # 训练参数
 best_accuracy = 0.0
@@ -48,7 +49,7 @@ for epoch in range(num_epochs):
     total = 0
 
     # 训练过程
-    for batch_idx, (data1, data2, labels) in enumerate(tqdm(train_loader, desc = f"Epoch [{epoch + 1}/{num_epochs}]")):
+    for batch_idx, (data1, data2, labels) in enumerate(tqdm(train_loader, desc=f"Epoch [{epoch + 1}/{num_epochs}]")):
         data1, data2, labels = data1.to(device), data2.to(device), labels.to(device)
 
         optimizer.zero_grad()
