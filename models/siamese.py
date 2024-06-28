@@ -1,43 +1,40 @@
 import torch
 from torch import nn
+from torchvision import models
+
 
 class Siamese(nn.Module):
     def __init__(self):
         super(Siamese, self).__init__()
-        self.features = self._make_feature_extractor()
-        self.fc = self._make_classifier()
 
-    def _make_feature_extractor(self):
-        layers = [
-            nn.Conv2d(3, 32, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Dropout(0.1),  # Dropout layer added
-            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),
-            nn.Dropout(0.1)   # Dropout layer added
-        ]
-        return nn.Sequential(*layers)
+        vgg_original = models.vgg16(pretrained=True)
 
-    def _make_classifier(self):
-        layers = [
-            nn.Linear(64 * 13 * 13, 256),
-            nn.ReLU(),
-            nn.Dropout(0.5),  # Dropout layer added
-            nn.Linear(256, 1),
-            nn.Sigmoid()
-        ]
-        return nn.Sequential(*layers)
+        self.features = vgg_original.features
+
+        self.flatten = nn.Flatten()
+
+        self.fc1 = nn.Linear(512, 512)
+        self.relu = nn.ReLU()
+
+        self.fc2 = nn.Linear(512, 1)
+        self.sigmoid = nn.Sigmoid()
 
     def forward_one(self, x):
         x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.fc(x)
+        x = self.flatten(x)
         return x
 
-    def forward(self, input1, input2):
-        output1 = self.forward_one(input1)
-        output2 = self.forward_one(input2)
-        distance = torch.abs(output1 - output2)
-        return distance  # Ensure this returns a shape of (batch_size, 1)
+    def forward(self, left, right):
+        left_output = self.forward_one(left)
+        right_output = self.forward_one(right)
+
+        # L1距离
+        l1_distance = torch.abs(left_output - right_output)
+
+        output = self.fc1(l1_distance)
+        output = self.relu(output)
+
+        output = self.fc2(output)
+        output = self.sigmoid(output)
+
+        return output
