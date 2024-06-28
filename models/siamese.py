@@ -4,7 +4,7 @@ from torchvision import models
 
 
 class Siamese(nn.Module):
-    def __init__(self, i):
+    def __init__(self):
         super(Siamese, self).__init__()
 
         vgg_original = models.vgg16(pretrained=True)
@@ -12,8 +12,8 @@ class Siamese(nn.Module):
         self.features = vgg_original.features
 
         self.flatten = nn.Flatten()
-        ex = i
-        self.fc1 = nn.Linear(ex, ex)
+
+        self.fc1 = nn.Linear(512, 512)
         self.relu = nn.ReLU()
 
         self.fc2 = nn.Linear(512, 1)
