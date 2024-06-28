@@ -9,7 +9,7 @@ from models.siamese import Siamese
 from custom_dataset import CustomSiameseDataset
 
 # 配置参数
-batch_size = 128
+batch_size = 32
 image_folder = './data'
 validation_split = 0.2  # 验证集比例
 num_epochs = 300
