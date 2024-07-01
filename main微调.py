@@ -2,21 +2,19 @@ import os
 import random
 import torch
 from torch import nn
-from torch.optim import SGD
+from torch.optim import Adam
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 from custom_datase import CustomSiameseDataset
 from models.siamese import Siamese
 
-
 # 配置参数
-batch_size = 128
-image_folder = './jpg'
+batch_size = 32
+image_folder = './k1/jpg'  # 新的数据集文件夹
 validation_split = 0.3
-num_epochs = 300
-learning_rate = 1e-3
-momentum = 0.9
-early_stop = 30
+num_epochs = 200
+learning_rate = 1e-5  # 微调时使用较小的学习率
+early_stop = 20
 
 # 确保数据分割正确，没有数据泄露
 dataset = CustomSiameseDataset(image_folder=image_folder)
@@ -37,13 +35,18 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 # 配置设备
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# 初始化模型
+# 初始化模型并加载预训练参数
 model = Siamese()
+model.load_state_dict(torch.load("checkpoints/best3.pt"))
 model = model.to(device)
+
+# 不冻结任何层，所有层都参与训练
+for name, param in model.named_parameters():
+    param.requires_grad = True
 
 # 损失函数和优化器
 criterion = nn.BCELoss()
-optimizer = SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+optimizer = Adam(model.parameters(), lr=learning_rate)
 
 # 训练参数
 best_accuracy = 0.0
@@ -56,8 +59,8 @@ train_accuracies = []
 val_accuracies = []
 
 # 创建保存数据的目录
-if not os.path.exists('data'):
-    os.makedirs('data')
+if not os.path.exists('checkpoints'):
+    os.makedirs('checkpoints')
 
 # 训练循环
 for epoch in range(num_epochs):
@@ -97,8 +100,6 @@ for epoch in range(num_epochs):
     train_losses.append(total_loss / (batch_idx + 1))
     train_accuracies.append(epoch_accuracy)
 
-
-
     print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss / (batch_idx + 1)}, Accuracy: {epoch_accuracy}%")
 
     model.eval()
@@ -134,14 +135,12 @@ for epoch in range(num_epochs):
 
     print(f"Validation Loss: {val_loss / len(val_loader)}, Validation Accuracy: {val_accuracy}%")
 
-    if not os.path.exists("checkpoints"):
-        os.mkdir("checkpoints")
-
-    torch.save(model.state_dict(), "checkpoints/last3.pt")
+    # 保存检查点
+    torch.save(model.state_dict(), f"checkpoints/epoch1_{epoch + 1}.pt")
 
     if val_accuracy > best_accuracy:
         best_accuracy = val_accuracy
-        torch.save(model.state_dict(), "checkpoints/best3.pt")
+        torch.save(model.state_dict(), "checkpoints/best_finetune.pt")
         epochs_no_improve = 0
     else:
         epochs_no_improve += 1
@@ -150,11 +149,10 @@ for epoch in range(num_epochs):
         print(f"No improvement in {early_stop} epochs, stopping training.")
         break
 
-
-# 导出为 ONNX 模型
+# 导出微调后的模型为 ONNX 格式
 dummy_input1 = torch.randn(1, 3, 52, 52).to(device)  # 修改 batch_size 为 1
 dummy_input2 = torch.randn(1, 3, 52, 52).to(device)
 torch.onnx.export(model, (dummy_input1, dummy_input2), "checkpoints/3d_rollball_objects_v2.onnx",
                   input_names=['input_left', 'input_right'],
                   output_names=['output'])
-print("Model has been successfully exported to ONNX format.")
+print("Finetuned model has been successfully exported to ONNX format.")
