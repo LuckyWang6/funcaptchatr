@@ -10,7 +10,7 @@ from models.siamese import Siamese
 
 # 配置参数
 batch_size = 32
-image_folder = './k1/jpg'  # 新的数据集文件夹
+image_folder = './jpg'  # 新的数据集文件夹
 validation_split = 0.3
 num_epochs = 200
 learning_rate = 1e-5  # 微调时使用较小的学习率
@@ -37,7 +37,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 初始化模型并加载预训练参数
 model = Siamese()
-model.load_state_dict(torch.load("checkpoints/best3.pt"))
+model.load_state_dict(torch.load("checkpoints/best.pt"))
 model = model.to(device)
 
 # 不冻结任何层，所有层都参与训练
