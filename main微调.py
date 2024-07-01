@@ -11,7 +11,7 @@ from models.siamese import Siamese
 # 配置参数
 batch_size = 32
 image_folder = './jpg'  # 新的数据集文件夹
-validation_split = 0.3
+validation_split = 0.2
 num_epochs = 200
 learning_rate = 1e-5  # 微调时使用较小的学习率
 early_stop = 20

@@ -10,9 +10,9 @@ from models.siamese import Siamese
 
 
 # 配置参数
-batch_size = 128
+batch_size = 32
 image_folder = './jpg'
-validation_split = 0.3
+validation_split = 0.2
 num_epochs = 300
 learning_rate = 1e-3
 momentum = 0.9
