@@ -37,7 +37,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 初始化模型并加载预训练参数
 model = Siamese()
-model.load_state_dict(torch.load("checkpoints/best.pt"))
+model.load_state_dict(torch.load("checkpoints/best_finetune.pt"))
 model = model.to(device)
 
 # 不冻结任何层，所有层都参与训练
