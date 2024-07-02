@@ -7,7 +7,7 @@ class Siamese(nn.Module):
     def __init__(self):
         super(Siamese, self).__init__()
 
-        vgg_original = models.vgg16(pretrained=True)
+        vgg_original = models.vgg16(weights=models.VGG16_Weights.IMAGENET1K_V1)
 
         self.features = vgg_original.features
 
