@@ -37,8 +37,8 @@ def train_model(seed):
     # 设置随机种子
     set_seed(seed)
     model = Siamese()
-    if os.path.exists('checkpoints/best_siamese_model.pt'):
-        model.load_state_dict(torch.load('checkpoints/best_siamese_model.pt'))
+    if os.path.exists('checkpoints/best_siamese_model.pth'):
+        model.load_state_dict(torch.load('checkpoints/best_siamese_model.pth'))
     model = model.to(device)
 
     criterion = nn.BCELoss()
@@ -77,7 +77,7 @@ def train_model(seed):
         torch.save(model.state_dict(), "checkpoints/last.pt")
         if epoch_accuracy > best_accuracy:
             best_accuracy = epoch_accuracy
-            torch.save(model.state_dict(), "checkpoints/best_siamese_model.pt")
+            torch.save(model.state_dict(), "checkpoints/best_siamese_model.pth")
             epochs_no_improve = 0
         else:
             epochs_no_improve += 1
