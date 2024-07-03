@@ -92,7 +92,7 @@ for epoch in range(num_epochs):
     if not os.path.exists("checkpoints"):
         os.mkdir("checkpoints")
 
-    torch.save(model.state_dict(), "checkpoints/last.pt")
+    torch.save(model.state_dict(), "checkpoints/last_" + str(epoch) + ".pt")
 
     if val_accuracy > best_accuracy:
         best_accuracy = val_accuracy
