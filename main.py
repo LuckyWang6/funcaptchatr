@@ -16,7 +16,7 @@ validation_split = 0.2  # 验证集比例
 num_epochs = 300
 learning_rate = 1e-3
 momentum = 0.9
-early_stop = 30
+early_stop = 100
 
 # 加载数据集
 dataset = CustomSiameseDataset(image_folder = image_folder)
@@ -39,6 +39,7 @@ optimizer = SGD(model.parameters(), lr = learning_rate, momentum = momentum)
 
 # 训练参数
 best_accuracy = 0.0
+best_loss = 100
 epochs_no_improve = 0
 
 # 训练循环
@@ -65,7 +66,8 @@ for epoch in range(num_epochs):
         correct += (predicted == labels.float()).sum().item()
 
     epoch_accuracy = 100 * correct / total
-    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss / (batch_idx + 1)}, Accuracy: {epoch_accuracy}%")
+    loss_batch = total_loss / (batch_idx + 1)
+    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss_batch}, Accuracy: {epoch_accuracy}%")
 
     # 验证过程
     model.eval()
@@ -97,11 +99,21 @@ for epoch in range(num_epochs):
         torch.save(model.state_dict(), "checkpoints/best.pt")
         epochs_no_improve = 0
     else:
+        if val_accuracy >= best_accuracy and loss_batch <= best_loss:
+            print('Saving model')
+            best_loss = loss_batch
+            torch.save(model.state_dict(), "checkpoints/best.pt")
         epochs_no_improve += 1
 
     if epochs_no_improve == early_stop:
         print(f"No improvement in {early_stop} epochs, stopping training.")
         break
+
+# 加载最好的模型权重
+model.load_state_dict(torch.load('checkpoints/best.pt'))
+
+# 设置模型为评估模式
+model.eval()
 
 # Save the trained model in ONNX format
 dummy_input1 = torch.randn(1, 3, 52, 52).to(device)
