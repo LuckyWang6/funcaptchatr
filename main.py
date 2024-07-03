@@ -20,11 +20,11 @@ def set_seed(seed):
     torch.backends.cudnn.benchmark = False
 
 
-batch_size = 10
-num_epochs = 100
+batch_size = 32
+num_epochs = 300
 
 epochs_no_improve = 0
-early_stop = 10
+early_stop = 30
 image_folder = './jpg'
 # 加载数据集
 dataset = CustomSiameseDataset(image_folder = image_folder)
@@ -37,8 +37,8 @@ def train_model(seed):
     # 设置随机种子
     set_seed(seed)
     model = Siamese()
-    if os.path.exists('checkpoints/best_siamese_model.pth'):
-        model.load_state_dict(torch.load('checkpoints/best_siamese_model.pth'))
+    # if os.path.exists('checkpoints/best_siamese_model.pth'):
+    #     model.load_state_dict(torch.load('checkpoints/best_siamese_model.pth'))
     model = model.to(device)
 
     criterion = nn.BCELoss()
