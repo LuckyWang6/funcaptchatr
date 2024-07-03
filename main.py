@@ -66,8 +66,7 @@ for epoch in range(num_epochs):
         correct += (predicted == labels.float()).sum().item()
 
     epoch_accuracy = 100 * correct / total
-    loss_batch = total_loss / (batch_idx + 1)
-    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss_batch}, Accuracy: {epoch_accuracy}%")
+    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss / (batch_idx + 1)}, Accuracy: {epoch_accuracy}%")
 
     # 验证过程
     model.eval()
@@ -87,7 +86,8 @@ for epoch in range(num_epochs):
             val_correct += (val_predicted == val_labels.float()).sum().item()
 
     val_accuracy = 100 * val_correct / val_total
-    print(f"Validation Loss: {val_loss / len(val_loader)}, Validation Accuracy: {val_accuracy}%")
+    loss_batch = val_loss / len(val_loader)
+    print(f"Validation Loss: {loss_batch}, Validation Accuracy: {val_accuracy}%")
 
     if not os.path.exists("checkpoints"):
         os.mkdir("checkpoints")
