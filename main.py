@@ -10,13 +10,13 @@ from models.siamese import Siamese
 from custom_dataset import CustomSiameseDataset
 
 # 配置参数
-batch_size = 32
+batch_size = 128
 image_folder = './jpg'
 validation_split = 0.2  # 验证集比例
 num_epochs = 300
 learning_rate = 1e-3
 momentum = 0.9
-early_stop = 50
+early_stop = 30
 
 # 加载数据集
 dataset = CustomSiameseDataset(image_folder = image_folder)
