@@ -16,7 +16,7 @@ validation_split = 0.2  # 验证集比例
 num_epochs = 300
 learning_rate = 1e-3
 momentum = 0.9
-early_stop = 100
+early_stop = 50
 
 # 加载数据集
 dataset = CustomSiameseDataset(image_folder = image_folder)
