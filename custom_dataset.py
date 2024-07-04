@@ -13,6 +13,7 @@ class CustomSiameseDataset(Dataset):
         self.images = [os.path.join(image_folder, f) for f in os.listdir(image_folder) if f.endswith('.jpg')]
         self.transform = transform if transform is not None else transforms.Compose([
             transforms.Resize((52, 52)),
+            transforms.Grayscale(num_output_channels = 3),  # 增加灰度处理，并保持3个通道
             transforms.ToTensor()
         ])
 
