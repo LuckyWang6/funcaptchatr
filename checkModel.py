@@ -17,6 +17,7 @@ model = model.to(device)
 lists = []
 transform = transforms.Compose([
     transforms.Resize((52, 52)),
+    transforms.Grayscale(num_output_channels = 3),  # 增加灰度处理，并保持3个通道
     transforms.ToTensor()
 ])
 
